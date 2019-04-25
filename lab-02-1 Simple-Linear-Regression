@@ -1,0 +1,31 @@
+lab-02-1 Simple-Linear-Regression
+
+import tensorflow as tf #tf로 tensorflow 가져오기
+import numpy as np #numpy 라이브러리를 np이라는 이름으로 가져오기
+tf.enable_eager_execution() #이 작업을 평생 진행
+
+# Data
+x_data = [1, 2, 3, 4, 5] #x 데이터의 목록
+y_data = [1, 2, 3, 4, 5] #y 데이터의 목록
+
+# W, b initialize
+W = tf.Variable(2.9) #W에 임의 값 2.9를 입력
+b = tf.Variable(0.5) #b에 임의 값 0.5를 입력
+
+# W, b update
+for i in range(100): #학습을 100번 반복
+    # Gradient descent
+    with tf.GradientTape() as tape: #입력 변수에 대한 값을 tape에 저장
+        hypothesis = W * x_data + b #가설식 세우기
+        cost = tf.reduce_mean(tf.square(hypothesis - y_data)) #cost함수를 실제값과 가설값의 차이의 평균으로 정의
+    W_grad, b_grad = tape.gradient(cost, [W, b]) #W_grad와 b_grad를 cost값과 W,b값으로 정의
+    W.assign_sub(learning_rate * W_grad) #뺀 값을 다시 learning_rate만큼 입력
+    b.assign_sub(learning_rate * b_grad) #뺀 값을 다시 learning_rate만큼 입력
+    if i % 10 == 0: #10번 마다 학습값 출력
+      print("{:5}|{:10.4f}|{:10.4f}|{:10.6f}".format(i, W.numpy(), b.numpy(), cost))
+
+print()
+
+# predict 
+print(W * 5 + b) #x에 5대입
+print(W * 2.5 + b) #x에 2.5
