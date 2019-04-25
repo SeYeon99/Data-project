@@ -13,7 +13,7 @@ W = tf.Variable(2.9) #W에 임의 값 2.9를 입력
 b = tf.Variable(0.5) #b에 임의 값 0.5를 입력
 
 # W, b update
-for i in range(100): #학습을 100번 반복
+for i in range(100): #학습을 100번 
     # Gradient descent
     with tf.GradientTape() as tape: #입력 변수에 대한 값을 tape에 저장
         hypothesis = W * x_data + b #가설식 세우기
