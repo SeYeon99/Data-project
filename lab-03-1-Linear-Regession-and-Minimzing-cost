@@ -1,0 +1,36 @@
+#Cost function in TensorFlow
+X = np.array([1, 2, 3]) #X 값은 np배열에 생성된 값으로 정의
+Y = np.array([1, 2, 3]) #Y 값은 np배열에 생성된 값으로 정의
+
+def cost_func(W, X, Y): #W, X, Y의 cost함수 정의
+  hypothesis = X * W #가설함수 세우기
+  return tf.reduce_mean(tf.square(hypothesis - Y)) #가설값에서 실제값을 빼서 나온 값들의 평균
+
+W_values = np.linspace(-3, 5, num=15) #-3에서 5까지 15간격마다 공백값 반환
+cost_values = []
+
+for feed_W in W_values:#W_values값을 feed_W에 입력
+    curr_cost = cost_func(feed_W, X, Y) #feed_W, X, Y에 대한 cost함수
+    cost_values.append(curr_cost) #cost에 curr_cost데이터를 추가
+    print("{:6.3f} | {:10.5f}".format(feed_W, curr_cost))
+
+#Gradient descent 
+tf.set_random_seed(0)  # for reproducibility #변수를 초기화
+
+x_data = [1., 2., 3., 4.] #x의 입력값
+y_data = [1., 3., 5., 7.] #y의 입력값
+
+W = tf.Variable(tf.random_normal([1], -100., 100.)) #W를 -100에서 100을 0~1 사이의 정규확률분포 값을 생성하고 변수로 정의
+
+for step in range(300): #학습을 300번 반복
+    hypothesis = W * X #가설 함수
+    cost = tf.reduce_mean(tf.square(hypothesis - Y)) #가설값에서 실제값을 뺀 값들의 평균
+
+    alpha = 0.01 #alpha는 0.01
+    gradient = tf.reduce_mean(tf.multiply(tf.multiply(W, X) - Y, X)) #gradient는 ((W*X)-Y)*X의 평균
+    descent = W - tf.multiply(alpha, gradient) #descen는 alpha*gradient
+    W.assign(descent) #W에 descent값을 할당
+    
+    if step % 10 == 0: #10번 마다 학습값 출력
+        print('{:5} | {:10.4f} | {:10.6f}'.format(
+            step, cost.numpy(), W.numpy()[0])) #학습값과 cost의 변화량, W의 변화량 
