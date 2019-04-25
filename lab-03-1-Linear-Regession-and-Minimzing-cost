@@ -22,7 +22,7 @@ y_data = [1., 3., 5., 7.] #y의 입력값
 
 W = tf.Variable(tf.random_normal([1], -100., 100.)) #W를 -100에서 100을 0~1 사이의 정규확률분포 값을 생성하고 변수로 정의
 
-for step in range(300): #학습을 300번 반복
+for step in range(300): #학습을 300번 
     hypothesis = W * X #가설 함수
     cost = tf.reduce_mean(tf.square(hypothesis - Y)) #가설값에서 실제값을 뺀 값들의 평균
 
