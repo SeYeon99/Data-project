@@ -1,1 +1,74 @@
+x_train = [[1., 2.], #x_train 데이터
+          [2., 3.],
+          [3., 1.],
+          [4., 3.],
+          [5., 3.],
+          [6., 2.]]
+y_train = [[0.], #y_train 데이터
+          [0.],
+          [0.],
+          [1.],
+          [1.],
+          [1.]]
 
+x_test = [[5.,2.]] #5행 2열 데이터
+y_test = [[1.]] 
+
+
+x1 = [x[0] for x in x_train] #x1을 x의 초기값 0에 x에 x_train를 입력을 정의
+x2 = [x[1] for x in x_train] #x2을 x의 초기값 1에 x에 x_train를 입력을 정의
+
+colors = [int(y[0] % 3) for y in y_train]
+plt.scatter(x1,x2, c=colors , marker='^')
+#x1,x2, c는 색, marker는 세모인 4개의 2차원 실수 데이터 집합의 상관관계를 보기위해 그래프 생성
+plt.scatter(x_test[0][0],x_test[0][1], c="red") #x_test[0][0],x_test[0][1], c는 빨강색의 그래프 생성
+
+plt.xlabel("x1") #그래프의 x축에 x1이라는 라벨을 부여
+plt.ylabel("x2") #그래프의 y축에 x2이라는 라벨을 부여
+plt.show() #그래프를 생성하여 보여주기
+
+dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(len(x_train))#.repeat()
+#dataset을 tensor_slices((x_train, y_train))..batch(len(x_train))로 정의
+#batch란 한 번에 계산할 데이터의 양을 의미
+
+W = tf.Variable(tf.zeros([2,1]), name='weight') 
+#W를 하나의 데이터에 0이 1개 들어있는 데이터를 2개 생성하고 이름을 weight로 정의
+b = tf.Variable(tf.zeros([1]), name='bias') #b를 0을 1개 가진 데이터를 생성하고 이름을 bias로 정의
+
+def logistic_regression(features): #logistic_regression을 정의
+    hypothesis  = tf.div(1., 1. + tf.exp(tf.matmul(features, W) + b))
+    #hypothesis는 1나누기 1. + tf.exp(tf.matmul(features, W) + b)값의 몫으로 정의
+    return hypothesis #hypothesis를 리턴
+    
+    def loss_fn(hypothesis, features, labels): #loss_fn 정의
+    cost = -tf.reduce_mean(labels * tf.log(logistic_regression(features)) + (1 - labels) * tf.log(1 - hypothesis))
+    #cost를 [labels 곱하기 log(logistic_regression(features))] 더하기 [(1 - labels) 곱하기 tf.log(1 - hypothesis))]의 마이너스 평균으로 정의
+    return cost #cost값을 리턴
+    
+optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.01)
+#optimizer를 learning_rate 0.01만큼 경사를 내려오게하는 알고리즘으로 정의
+
+def accuracy_fn(hypothesis, labels): #accuracy_fn정의
+    predicted = tf.cast(hypothesis > 0.5, dtype=tf.float32)
+    #predicted를 데이터 타입이 32비트이고 hypothesis > 0.5를 만족하면 1로 반환하는 변수로 정의
+    accuracy = tf.reduce_mean(tf.cast(tf.equal(predicted, labels), dtype=tf.int32))
+    #accuracy를 데이터 타입이 32비트이고 predicted와 labels 1인 변수를 이 변수를 조건으로 하는 tf.cast로 정의
+    return accuracy #accuracy를 리턴
+    
+    def grad(hypothesis, features, labels): #grad를 정의
+    with tf.GradientTape() as tape: #입력 변수에 대한 값을 tape에 저장
+        loss_value = loss_fn(logistic_regression(features),features,labels)
+        #loss_value을 logistic_regression(features)를 넣은 loss_fn으로 정의
+    return tape.gradient(loss_value, [W,b]) #tape.gradient(loss_value, [W,b])를 리턴
+    
+    EPOCHS = 1001 #EPOCHS란 샘픙 데이터를 이용하여 한 바퀴 돌며 학습하는 것을 1회 epochs라고 부름, 1001번 순회
+
+for step in range(EPOCHS): #EPOCHS만큼 수행
+    for features, labels  in tfe.Iterator(dataset): # features, labels에 tfe.Iterator(dataset)를 입력
+        grads = grad(logistic_regression(features), features, labels) 
+        #grads를 logistic_regression(features), features, labels을 입력한 grad함수로 정의
+        optimizer.apply_gradients(grads_and_vars=zip(grads,[W,b])) #Gradient 계산값 구하여 (grads_and_vars=zip(grads,[W,b])를 수동 적용
+        if step % 100 == 0: #100번 마다 학습값 출력
+            print("Iter: {}, Loss: {:.4f}".format(step, loss_fn(logistic_regression(features),features,labels)))
+test_acc = accuracy_fn(logistic_regression(x_test),y_test) #test_acc를 logistic_regression(x_test),y_test를 입력한 accuracy_fn로 정의
+print("Testset Accuracy: {:.4f}".format(test_acc))
