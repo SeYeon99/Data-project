@@ -19,8 +19,8 @@ for i in range(100): #학습을 100번 반복
         hypothesis = W * x_data + b #가설식 세우기
         cost = tf.reduce_mean(tf.square(hypothesis - y_data)) #cost함수를 실제값과 가설값의 차이의 평균으로 정의
     W_grad, b_grad = tape.gradient(cost, [W, b]) #W_grad와 b_grad를 cost값과 W,b값으로 정의
-    W.assign_sub(learning_rate * W_grad) #뺀 값을 다시 learning_rate만큼 입력
-    b.assign_sub(learning_rate * b_grad) #뺀 값을 다시 learning_rate만큼 입력
+    W.assign_sub(learning_rate * W_grad) #W=W-(learning_rate * W_grad)
+    b.assign_sub(learning_rate * b_grad) #b=b-(learning_rate * b_grad)
     if i % 10 == 0: #10번 마다 학습값 출력
       print("{:5}|{:10.4f}|{:10.4f}|{:10.6f}".format(i, W.numpy(), b.numpy(), cost))
 
